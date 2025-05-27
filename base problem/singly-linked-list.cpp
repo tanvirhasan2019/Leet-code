@@ -1,185 +1,214 @@
 #include <iostream>
 using namespace std;
 
-// Node struct represents a single element in our linked list
-struct Node {
-    int data;       // The value stored in this node
-    Node* next;     // Pointer to the next node
-    
-    // Constructor to make node creation easier
-    Node(int value) {
-        data = value;
-        next = nullptr;  // Initially, the node doesn't point to anything
-    }
+// Declare List Node
+struct ListNode {
+    int data;
+    ListNode* next;
+    ListNode(int val) : data(val), next(nullptr) {};
 };
 
-// LinkedList struct to manage a collection of nodes
-struct LinkedList {
-    Node* head;  // Points to the first node in the list
+// Create List 1 -> 2 -> 3 -> 4 -> 5
+ListNode* createListNode() {
+    ListNode* head = new ListNode(1);
+    head->next = new ListNode(2);
+    head->next->next = new ListNode(3);
+    head->next->next->next = new ListNode(4);
+    head->next->next->next->next = new ListNode(5);
+    return head;
+}
+
+// Add a new node at the beginning of the list (prepend)
+ListNode* insertAtBeginning(ListNode* head, int value) {
+    ListNode* newNode = new ListNode(value);
+    newNode->next = head;
+    return newNode;  // Return new head
+}
+
+// Add a new node at the end of the list (append)
+ListNode* insertAtEnd(ListNode* head, int value) {
+    ListNode* newNode = new ListNode(value);
     
-    // Constructor - creates an empty list
-    LinkedList() {
-        head = nullptr;
+    // If the list is empty, make the new node the head
+    if (head == nullptr) {
+        return newNode;
     }
     
-    // Add a new node at the beginning of the list (prepend)
-    void insertAtBeginning(int value) {
-        // Create a new node with the given value
-        Node* newNode = new Node(value);
-        
-        // Make the new node point to the current head
+    // Otherwise, find the last node
+    ListNode* temp = head;
+    while (temp->next != nullptr) {
+        temp = temp->next;
+    }
+    
+    // Link the last node to our new node
+    temp->next = newNode;
+    return head;  // Head doesn't change
+}
+
+// Insert a node after a specific position (0-based index)
+ListNode* insertAfterPosition(ListNode* head, int position, int value) {
+    ListNode* newNode = new ListNode(value);
+    
+    // If list is empty or position is 0, insert at beginning
+    if (head == nullptr || position < 0) {
         newNode->next = head;
-        
-        // Update head to point to the new node
-        head = newNode;
+        return newNode;
     }
     
-    // Add a new node at the end of the list (append)
-    void insertAtEnd(int value) {
-        // Create a new node with the given value
-        Node* newNode = new Node(value);
-        
-        // If the list is empty, make the new node the head
-        if (head == nullptr) {
-            head = newNode;
-            return;
-        }
-        
-        // Otherwise, find the last node
-        Node* temp = head;
-        while (temp->next != nullptr) {
-            temp = temp->next;
-        }
-        
-        // Link the last node to our new node
-        temp->next = newNode;
+    // Find the node at the given position
+    ListNode* temp = head;
+    int currentPos = 0;
+    
+    while (temp != nullptr && currentPos < position) {
+        temp = temp->next;
+        currentPos++;
     }
     
-    // Insert a node after a specific position (0-based index)
-    void insertAfterPosition(int position, int value) {
-        // Create a new node with the given value
-        Node* newNode = new Node(value);
-        
-        // If list is empty or position is 0, insert at beginning
-        if (head == nullptr || position < 0) {
-            newNode->next = head;
-            head = newNode;
-            return;
-        }
-        
-        // Find the node at the given position
-        Node* temp = head;
-        int currentPos = 0;
-        
-        while (temp != nullptr && currentPos < position) {
-            temp = temp->next;
-            currentPos++;
-        }
-        
-        // If position is beyond the end, add at the end
-        if (temp == nullptr) {
-            insertAtEnd(value);
-            return;
-        }
-        
-        // Insert the new node after temp
-        newNode->next = temp->next;
-        temp->next = newNode;
+    // If position is beyond the end, add at the end
+    if (temp == nullptr) {
+        return insertAtEnd(head, value);
     }
     
-    // Delete the first node with the given value
-    void deleteNode(int value) {
-        // If list is empty, nothing to delete
-        if (head == nullptr) {
-            return;
-        }
-        
-        // If head has the value to delete
-        if (head->data == value) {
-            Node* temp = head;
-            head = head->next;
-            delete temp;
-            return;
-        }
-        
-        // Search for the node to delete
-        Node* temp = head;
-        while (temp->next != nullptr && temp->next->data != value) {
-            temp = temp->next;
-        }
-        
-        // If the value was found
-        if (temp->next != nullptr) {
-            Node* nodeToDelete = temp->next;
-            temp->next = nodeToDelete->next;
-            delete nodeToDelete;
-        }
-    }
-    
-    // Display all elements in the list
-    void display() {
-        Node* temp = head;
-        
-        while (temp != nullptr) {
-            cout << temp->data << " -> ";
-            temp = temp->next;
-        }
-        
-        cout << "nullptr" << endl;
-    }
-    
-    // Search for a value and return true if found
-    bool search(int value) {
-        Node* temp = head;
-        
-        while (temp != nullptr) {
-            if (temp->data == value) {
-                return true;
-            }
-            temp = temp->next;
-        }
-        
-        return false;
-    }
-    
-    // Clean up memory when the list is destroyed
-    ~LinkedList() {
-        Node* current = head;
-        Node* next;
-        
-        while (current != nullptr) {
-            next = current->next;
-            delete current;
-            current = next;
-        }
-        
-        head = nullptr;
-    }
-};
+    // Insert the new node after temp
+    newNode->next = temp->next;
+    temp->next = newNode;
+    return head;
+}
 
-// Example usage
+// Delete the first node with the given value
+ListNode* deleteNode(ListNode* head, int value) {
+    // If list is empty, nothing to delete
+    if (head == nullptr) {
+        return head;
+    }
+    
+    // If head has the value to delete
+    if (head->data == value) {
+        ListNode* temp = head;
+        head = head->next;
+        delete temp;
+        return head;
+    }
+    
+    // Search for the node to delete
+    ListNode* temp = head;
+    while (temp->next != nullptr && temp->next->data != value) {
+        temp = temp->next;
+    }
+    
+    // If the value was found
+    if (temp->next != nullptr) {
+        ListNode* nodeToDelete = temp->next;
+        temp->next = nodeToDelete->next;
+        delete nodeToDelete;
+    }
+    
+    return head;
+}
+
+// Search for a value and return true if found
+bool search(ListNode* head, int value) {
+    ListNode* temp = head;
+    
+    while (temp != nullptr) {
+        if (temp->data == value) {
+            return true;
+        }
+        temp = temp->next;
+    }
+    
+    return false;
+}
+
+// Print Data
+void printData(ListNode* head) {
+    ListNode* current = head;
+    while (current != nullptr) {
+        cout << current->data;
+        if (current->next != nullptr) {
+            cout << " -> ";
+        }
+        current = current->next;
+    }
+    cout << " -> nullptr" << endl;
+}
+
+// Reverse linkedList
+// NULL  ←   1    ←   2    ←   3   ←    4 ←    5
+ListNode* reverseList(ListNode* head) {
+    ListNode* prev = nullptr;
+    ListNode* curr = head;
+    ListNode* next = nullptr;
+    
+    while (curr != nullptr) {
+        next = curr->next;    // Store next node
+        curr->next = prev;    // Reverse the link
+        prev = curr;          // Move prev forward
+        curr = next;          // Move curr forward
+    }
+    return prev;  // prev is now the new head
+}
+
+// Clean up memory - delete all nodes
+void deleteList(ListNode* head) {
+    ListNode* current = head;
+    ListNode* next;
+    
+    while (current != nullptr) {
+        next = current->next;
+        delete current;
+        current = next;
+    }
+}
+
 int main() {
-    LinkedList list;
+    // Create initial list: 1 -> 2 -> 3 -> 4 -> 5
+    ListNode* head = createListNode();
     
-    // Add some elements
-    list.insertAtEnd(10);
-    list.insertAtEnd(20);
-    list.insertAtBeginning(5);
-    list.insertAfterPosition(1, 15);
+    cout << "=== LinkedList Operations Demo ===" << endl;
     
-    // Display the list
-    cout << "Linked List: ";
-    list.display();  // Output: 5 -> 10 -> 15 -> 20 -> nullptr
+    // Print original data
+    cout << "Original List: ";
+    printData(head);
     
-    // Search for a value
-    cout << "Searching for 15: " << (list.search(15) ? "Found" : "Not Found") << endl;
+    // Test insertions
+    head = insertAtBeginning(head, 0);
+    cout << "After inserting 0 at beginning: ";
+    printData(head);
     
-    // Delete a node
-    list.deleteNode(10);
+    head = insertAtEnd(head, 6);
+    cout << "After inserting 6 at end: ";
+    printData(head);
     
-    // Display the updated list
-    cout << "After deleting 10: ";
-    list.display();  // Output: 5 -> 15 -> 20 -> nullptr
+    head = insertAfterPosition(head, 2, 99);
+    cout << "After inserting 99 at position 2: ";
+    printData(head);
+    
+    // Test search
+    cout << "Searching for 99: " << (search(head, 99) ? "Found" : "Not Found") << endl;
+    cout << "Searching for 100: " << (search(head, 100) ? "Found" : "Not Found") << endl;
+    
+    // Test deletion
+    head = deleteNode(head, 99);
+    cout << "After deleting 99: ";
+    printData(head);
+    
+    // Test reverse functionality
+    cout << "\n=== Reverse Functionality ===" << endl;
+    cout << "Before reverse: ";
+    printData(head);
+    
+    head = reverseList(head);
+    cout << "After reverse: ";
+    printData(head);
+    
+    // Reverse back to original
+    head = reverseList(head);
+    cout << "Reversed back: ";
+    printData(head);
+    
+    // Clean up memory
+    deleteList(head);
     
     return 0;
 }
