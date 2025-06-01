@@ -179,6 +179,29 @@ bool hasCycle(ListNode* head) {
     return false;                     // 🚫 No cycle
 }
 
+//  Merge two sorted linked lists into a single sorted list
+ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+    ListNode dummy(0); // Dummy node to simplify logic
+    ListNode* tail = &dummy;
+
+    while (l1 != nullptr && l2 != nullptr) {
+        if (l1->val < l2->val) {
+            tail->next = l1;  // attach l1 node
+            l1 = l1->next;
+        } else {
+            tail->next = l2;  // attach l2 node
+            l2 = l2->next;
+        }
+        tail = tail->next;     // move the tail
+    }
+
+    // Attach the remaining nodes
+    if (l1 != nullptr) tail->next = l1;
+    if (l2 != nullptr) tail->next = l2;
+
+    return dummy.next; // head of the merged list
+}
+
 int main() {
     // Create initial list: 1 -> 2 -> 3 -> 4 -> 5
     ListNode* head = createListNode();
