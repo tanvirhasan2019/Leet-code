@@ -161,6 +161,24 @@ void deleteList(ListNode* head) {
     }
 }
 
+
+// Two pointers: slow moves one step at a time. fast moves two steps at a time. | If there’s a cycle, fast will eventually catch up to slow inside the cycle.
+bool hasCycle(ListNode* head) {
+    ListNode* slow = head;
+    ListNode* fast = head;
+
+    while (fast != nullptr && fast->next != nullptr) {
+        slow = slow->next;            // Move 1 step
+        fast = fast->next->next;      // Move 2 steps
+
+        if (slow == fast) {
+            return true;              // 🌀 Cycle found
+        }
+    }
+
+    return false;                     // 🚫 No cycle
+}
+
 int main() {
     // Create initial list: 1 -> 2 -> 3 -> 4 -> 5
     ListNode* head = createListNode();
